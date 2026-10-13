@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makoto Kanda | Hybrid Portfolio Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0f11;
+            --text: #e2e8f0;
+            --accent: #00ffc3;
+            --secondary: #94a3b8;
+            --border: #1e293b;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* Header */
+        header {
+            border-left: 8px solid var(--accent);
+            padding-left: 30px;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: -3px;
+            text-transform: uppercase;
+            line-height: 0.85;
+        }
+
+        .tagline {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .contact-info {
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Summary Section */
+        .manifesto {
+            background: var(--glass);
+            padding: 30px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            margin-bottom: 50px;
+        }
+
+        .manifesto p {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        .manifesto strong {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 50px;
+        }
+
+        section { margin-bottom: 40px; }
+
+        h2 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        /* Entry Styles */
+        .entry { margin-bottom: 35px; }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .title { font-size: 1.2rem; font-weight: 700; color: #fff; }
+        .company { color: var(--secondary); font-weight: 400; font-size: 0.95rem; }
+        .date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            background: rgba(0, 255, 195, 0.1);
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        ul { list-style: none; padding: 0; margin: 12px 0 0 0; }
+        li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+        li::before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer Skills */
+        .skills-footer {
+            margin-top: 40px;
+            padding: 30px;
+            border-top: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .skill-item { margin-bottom: 10px; }
+        .skill-label { color: var(--accent); margin-right: 10px; }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            h1 { font-size: 3rem; }
+        }
+
+        /* Print Override */
+        @media print {
+            body { background: white; color: black; padding: 20px; }
+            .container { max-width: 100%; }
+            .manifesto { background: none; border: 1px solid #000; }
+            .date { background: none; border: 1px solid #000; color: black; }
+            h1, h2, .title, .tagline { color: black !important; }
+            li::before { content: "•"; color: black; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Makoto Kanda</h1>
+            <div class="tagline">I18n Architect &bull; Elite Dishwasher &bull; Community Coordinator</div>
+            <div class="contact-info">
+                <span>Silicon Valley Veteran</span>
+                <span>Relocating to Japan (2027)</span>
+                <span>Keio University (B.A. Economics)</span>
+            </div>
+        </header>
+
+        <div class="manifesto">
+            <p>
+                A high-altitude software architect with a low-altitude passion for <strong>manual labor</strong>. 
+                29 years at <strong>Oracle</strong> leading global i18n systems, balanced by a decade of 
+                removing chicken lungs, brewing Pinot Noir, and orchestrating high-tech 
+                treasure hunts across the Bay Area. Retired via layoff; currently focused on cats, 
+                AI-driven music, custom web tools, and avoiding any task that requires a necktie.
+            </p>
+        </div>
+
+        <div class="grid">
+            <!-- Column 1: The Corporate & Tech Life -->
+            <div class="col-1">
+                <section>
+                    <h2>Corporate Legacy</h2>
+                    <div class="entry">
+                        <div class="entry-header">
+                            <span class="title">Director <span class="company">Oracle Corp</span></span>
+                            <span class="date">1999 – 2025</span>
+                        </div>
+                        <ul>
+                            <li>Lead architecture designer for <strong>E-Business Suite Internationalization</strong>.</li>
+                            <li>Global liaison for <strong>Java i18n</strong> and Oracle-wide font licensing.</li>
+                            <li>Managed complex software lifecycles from prototype to global support.</li>
+                            <li>Transitioned from Oracle Japan to HQ, bridging two distinct business cultures.</li>
+                        </ul>
+                    </div>
+
+                    <div class="entry">
+                        <div class="entry-header">
+                            <span class="title">Product Evangelist <span class="company">Oracle Japan</span></span>
+                            <span class="date">1996 – 1999</span>
+                        </div>
+                        <ul>
+                            <li>Technical evangelist for Oracle Developer/2000.</li>
+                            <li>Responsible for market expansion and localization support of emerging tools.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Projects & Digital Craft</h2>
+                    <div class="entry">
+                        <div class="entry-header">
+                            <span class="title">Indie Creator & Developer</span>
+                            <span class="date">Present</span>
+                        </div>
+                        <ul>
+                            <li><strong>Web Tools & PWA:</strong> Developed utility web apps like <a href="https://makoto-kanda.github.io/" target="_blank">jirocall</a> and Pokémon GO tools hosted on GitHub Pages.</li>
+                            <li><strong>Automation Scripts:</strong> Custom Python tools (OpenCV/Pillow) for image processing, background transparency, and static site generation.</li>
+                            <li><strong>Miles Alder:</strong> Indie folk and acoustic music project, generating tracks via Suno AI and distributing to major streaming platforms.</li>
+                            <li><strong>LINE Creators Market:</strong> Designed and published original sticker sets (e.g., <em>Kanda Panda</em>) utilizing custom image-processing workflows.</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Column 2: The Real-World & Business Life -->
+            <div class="col-2">
+                <section>
+                    <h2>Real-World Operations</h2>
+                    <div class="entry">
+                        <div class="entry-header">
+                            <span class="title">Leaseholding Partner <span class="company">Higuma Restaurant</span></span>
+                            <span class="date">2016 – Present</span>
+                        </div>
+                        <ul>
+                            <li>Business partnership and operational involvement at Higuma Japanese Restaurant (Redwood City).</li>
+                            <li><strong>Bio-Logic Ops:</strong> Meticulous removal of chicken lungs, egg yolk separation, and commercial kitchen support.</li>
+                            <li><strong>Industrial Sanitation:</strong> Professional-grade dishwasher operation, fryer deep-cleaning, and heavy inventory logistics.</li>
+                        </ul>
+                    </div>
+
+                    <div class="entry">
+                        <div class="entry-header">
+                            <span class="title">Wine Ventures & Support</span>
+                            <span class="date">2002 – 2015</span>
+                        </div>
+                        <ul>
+                            <li><strong>SHIP2U:</strong> Founder, exporting California wine to Japanese collectors.</li>
+                            <li><strong>0906:</strong> Personally crafted Pinot Noir from celebrated California vineyards.</li>
+                            <li><strong>Crushpad Japan:</strong> Directed winemaking plans and logistics; hosted Japanese visitors, bridged designers and clients, and produced Japanese-localized label art using Adobe Illustrator.</li>
+                        </ul>
+                    </div>
+
+                    <div class="entry">
+                        <div class="entry-header">
+                            <span class="title">Community & Volunteer</span>
+                            <span class="date">Active</span>
+                        </div>
+                        <ul>
+                            <li><strong>Pokémon GO Belmont/San Carlos/Redwood Shores:</strong> Founder of the local community Discord server (ownership transferred).</li>
+                            <li><strong>Engrish of Japan:</strong> Moderator managing post approvals and community standards for the Facebook group.</li>
+                            <li><strong>Geocachers of the Bay Area:</strong> Managing high-tech outdoor treasure hunts and community engagement.</li>
+                            <li><strong>Groundspeak:</strong> Volunteer localization of global platforms for the Japanese market.</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="skills-footer">
+            <div class="skill-item"><span class="skill-label">CORE_STACK:</span> Python, JavaScript, HTML/CSS, Java i18n, Unicode, SQL</div>
+            <div class="skill-item"><span class="skill-label">WORKFLOWS:</span> Git/GitHub Pages, PWA Development, OpenCV/Pillow, Adobe Illustrator, Audio & Image Automation</div>
+            <div class="skill-item"><span class="skill-label">CREATIVE:</span> Suno AI (Miles Alder), LINE Creators Market, MIDI Emulation (Nuked-SC55)</div>
+            <div class="skill-item"><span class="skill-label">ELITE_HOBBY:</span> 2,000+ Gold Gyms across the SF Bay Area (Pokémon GO)</div>
+            <div class="skill-item"><span class="skill-label">LAST_INPUT:</span> "Internationalization is a job. Localization is a lifestyle."</div>
+        </div>
+    </div>
+</body>
+</html>
