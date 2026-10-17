@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINEスタンプ モニター応募フォーム</title>
+    <title>LINEスタンプ モニター応募</title>
     <!-- EmailJSのSDK読み込み -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -163,7 +163,7 @@
         </div>
 
         <button type="submit" id="submitBtn" disabled>ちょうど24個選ぶと送信できます</button>
-        <div id="loading">送信中... しばらくお待ちください</div>
+        <div id="loading">画像をアップロード中... しばらくお待ちください</div>
     </form>
 </div>
 
@@ -229,7 +229,7 @@
         }
     }
 
-    // フォーム送信処理（EmailJS経由）
+    // フォーム送信処理（Imgbb経由でURL化してEmailJSで送信）
     document.getElementById('stampForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -242,34 +242,53 @@
         submitBtn.style.display = 'none';
         loadingEl.style.display = 'block';
 
-        const selectedPhrases = Array.from(checkedBoxes).map(cb => cb.value).join(', ');
+        // 1行ずつ綺麗に番号付きリスト化
+        const selectedPhrasesList = Array.from(checkedBoxes)
+            .map((cb, idx) => `${idx + 1}. ${cb.value}`)
+            .join('\n');
+
         const imageFile = document.getElementById('image').files[0];
 
-        // 画像をBase64に変換してメールテンプレートに渡す（無料プランでの添付用）
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64Image = e.target.result;
+        // Imgbbの無料API（登録不要の匿名アップロード）へ画像を送信
+        const formData = new FormData();
+        formData.append('image', imageFile);
 
+        // ※imgbbの無料APIキー（パブリックなテスト用キーですが、ご自身で取得したい場合は https://api.imgbb.com/ で無料発行できます）
+        const imgbbApiKey = '6d207e02194a847a9449852f955d96f9'; 
+
+        fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (!result.success) {
+                throw new Error('画像のアップロードに失敗しました');
+            }
+
+            const imageUrl = result.data.url;
+
+            // EmailJSへ渡すパラメータ
             const templateParams = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
-                phrases: selectedPhrases,
-                my_image: base64Image // テンプレート側で <img src="{{my_image}}"> として表示可能
+                phrases: selectedPhrasesList,
+                image_url: imageUrl
             };
 
             // ★ご自身の Service ID と Template ID に書き換えてください
-            emailjs.send('service_wczz7cg', 'template_9cflrsv', templateParams)
-                .then(function(response) {
-                    alert('応募が完了しました！ありがとうございます。');
-                    location.reload();
-                }, function(error) {
-                    alert('送信に失敗しました。時間をおいて再度お試しください。');
-                    console.log('FAILED...', error);
-                    submitBtn.style.display = 'block';
-                    loadingEl.style.display = 'none';
-                });
-        };
-        reader.readAsDataURL(imageFile);
+            return emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
+        })
+        .then(function(response) {
+            alert('応募が完了しました！ありがとうございます。');
+            location.reload();
+        })
+        .catch(function(error) {
+            alert('送信に失敗しました。画像サイズが大きいか、通信環境をご確認ください。');
+            console.error('ERROR:', error);
+            submitBtn.style.display = 'block';
+            loadingEl.style.display = 'none';
+        });
     });
 </script>
 

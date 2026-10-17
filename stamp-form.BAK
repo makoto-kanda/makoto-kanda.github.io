@@ -258,7 +258,7 @@
             };
 
             // ★ご自身の Service ID と Template ID に書き換えてください
-            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+            emailjs.send('service_wczz7cg', 'template_9cflrsv', templateParams)
                 .then(function(response) {
                     alert('応募が完了しました！ありがとうございます。');
                     location.reload();
