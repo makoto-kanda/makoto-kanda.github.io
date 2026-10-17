@@ -132,9 +132,8 @@
         </ul>
     </div>
 
-    <!-- action="/" を指定してPOSTの送信先をトップルートに明示 -->
-    <form name="stamp-applications" action="/" method="POST" data-netlify="true" enctype="multipart/form-data" id="stampForm">
-        <!-- Netlifyフォーム識別用のhiddenフィールド -->
+    <!-- actionを自分自身のファイル名に変更し、Netlifyが確実に同一ページでフォームを処理できるようにする -->
+    <form name="stamp-applications" action="stamp-form.html" method="POST" data-netlify="true" enctype="multipart/form-data" id="stampForm">
         <input type="hidden" name="form-name" value="stamp-applications">
 
         <div class="form-group">
@@ -225,8 +224,7 @@
         }
     }
 
-    // ボタンの「クリック時」にデータのセットだけを行い、フォーム送信はブラウザの標準動作に任せる
-    submitBtn.addEventListener('click', function(event) {
+    document.getElementById('stampForm').addEventListener('submit', function(event) {
         const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkedBoxes.length !== 24) {
             event.preventDefault();
@@ -234,7 +232,6 @@
             return;
         }
 
-        // 1行ずつ綺麗に番号付きリスト化してhiddenに格納
         const selectedPhrasesList = Array.from(checkedBoxes)
             .map((cb, idx) => `${idx + 1}. ${cb.value}`)
             .join('\n');
