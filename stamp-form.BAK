@@ -127,7 +127,7 @@
     </div>
 
     <!-- actionのメールアドレスをご自身のものに変更してください -->
-    <form action="https://formsubmit.co/YOUR_EMAIL@example.com" method="POST" enctype="multipart/form-data" id="stampForm">
+    <form action="https://formsubmit.co/makoto.kanda@gmail.com" method="POST" enctype="multipart/form-data" id="stampForm">
         
         <!-- FormSubmitの設定（送信後のサンクスページ設定やスパム防止用） -->
         <input type="hidden" name="_subject" value="【LINEスタンプ応募】新規モニター申込">

@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LINEスタンプ モニター応募フォーム</title>
+    <!-- EmailJSのSDK読み込み -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // ★ご自身のPublic Keyに書き換えてください
+            emailjs.init("YOUR_PUBLIC_KEY");
+        })();
+    </script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -108,31 +116,31 @@
         button[type="submit"]:hover:not(:disabled) {
             background-color: #1c7ed6;
         }
+        #loading {
+            display: none;
+            text-align: center;
+            font-weight: bold;
+            color: #228be6;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>LINEスタンプ モニター応募</h1>
-    <p class="intro">お気に入りの写真（ご本人やペット等）を元に、AIイラスト化して24個のスタンプを作成します！</p>
+    <p class="intro">お気に入りの写真を元に、AIイラスト化して24個のスタンプを作成します！</p>
 
-    <!-- 注意事項・プライバシー・免責事項 -->
     <div class="section-box">
         <h3>⚠️ ご応募にあたっての注意事項</h3>
         <ul>
-            <li><strong>データの取り扱い:</strong> アップロードいただいた画像およびデータは、LINEスタンプの制作・申請作業**のみ**に使用します。AIの追加学習等に流用することや、第三者へ提供・公開することは一切ありません。</li>
-            <li><strong>仕上がりに関する免責:</strong> AI生成の特性上、元の画像の細部やニュアンスが完全に再現されない場合があります。仕上がりの微調整や描き直しのリクエストにはお応えできませんので、あらかじめご了承の上ご応募ください。</li>
+            <li><strong>データの取り扱い:</strong> アップロードいただいた画像およびデータは、LINEスタンプの制作・申請作業<strong>のみ</strong>に使用します。第三者への提供や公開は一切ありません。</li>
+            <li><strong>仕上がりに関する免責:</strong> AI生成の特性上、元の画像のニュアンスが完全に再現されない場合があります。描き直しのリクエストにはお応えできません。</li>
             <li><strong>権利について:</strong> ご自身が権利を有する写真（ご本人、ご家族、ご自身のペットなど）に限定させていただきます。</li>
         </ul>
     </div>
 
-    <!-- actionのメールアドレスをご自身のものに変更してください -->
-    <form action="https://formsubmit.co/makoto.kanda@gmail.com" method="POST" enctype="multipart/form-data" id="stampForm">
-        
-        <!-- FormSubmitの設定（送信後のサンクスページ設定やスパム防止用） -->
-        <input type="hidden" name="_subject" value="【LINEスタンプ応募】新規モニター申込">
-        <input type="hidden" name="_captcha" value="false">
-
+    <form id="stampForm">
         <div class="form-group">
             <label for="name">お名前（またはニックネーム）</label>
             <input type="text" id="name" name="name" required placeholder="例：カンダ">
@@ -151,17 +159,15 @@
 
         <div class="form-group">
             <label>スタンプにしたいフレーズを <span class="counter" id="counter">0</span> / 24個選んでください</label>
-            <div class="checkbox-grid" id="phraseGrid">
-                <!-- JavaScriptで32個の選択肢を動的生成 -->
-            </div>
+            <div class="checkbox-grid" id="phraseGrid"></div>
         </div>
 
         <button type="submit" id="submitBtn" disabled>ちょうど24個選ぶと送信できます</button>
+        <div id="loading">送信中... しばらくお待ちください</div>
     </form>
 </div>
 
 <script>
-    // 32個のフレーズリスト
     const phrases = [
         "おはよう", "おつかれさま", "ありがとう", "ごめんなさい",
         "よろしく！", "おやすみ", "了解です！", "はーい",
@@ -176,8 +182,8 @@
     const grid = document.getElementById('phraseGrid');
     const counterEl = document.getElementById('counter');
     const submitBtn = document.getElementById('submitBtn');
+    const loadingEl = document.getElementById('loading');
 
-    // チェックボックスを動的に生成
     phrases.forEach((phrase, index) => {
         const item = document.createElement('div');
         item.className = 'checkbox-item';
@@ -187,7 +193,6 @@
         checkbox.name = 'phrases';
         checkbox.value = phrase;
         checkbox.id = 'phrase_' + index;
-        
         checkbox.addEventListener('change', updateSelection);
 
         const label = document.createElement('label');
@@ -223,6 +228,49 @@
             }
         }
     }
+
+    // フォーム送信処理（EmailJS経由）
+    document.getElementById('stampForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const checkedBoxes = document.querySelectorAll('input[name="phrases"]:checked');
+        if (checkedBoxes.length !== 24) {
+            alert('フレーズはちょうど24個選択してください。');
+            return;
+        }
+
+        submitBtn.style.display = 'none';
+        loadingEl.style.display = 'block';
+
+        const selectedPhrases = Array.from(checkedBoxes).map(cb => cb.value).join(', ');
+        const imageFile = document.getElementById('image').files[0];
+
+        // 画像をBase64に変換してメールテンプレートに渡す（無料プランでの添付用）
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Image = e.target.result;
+
+            const templateParams = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phrases: selectedPhrases,
+                my_image: base64Image // テンプレート側で <img src="{{my_image}}"> として表示可能
+            };
+
+            // ★ご自身の Service ID と Template ID に書き換えてください
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                .then(function(response) {
+                    alert('応募が完了しました！ありがとうございます。');
+                    location.reload();
+                }, function(error) {
+                    alert('送信に失敗しました。時間をおいて再度お試しください。');
+                    console.log('FAILED...', error);
+                    submitBtn.style.display = 'block';
+                    loadingEl.style.display = 'none';
+                });
+        };
+        reader.readAsDataURL(imageFile);
+    });
 </script>
 
 </body>
