@@ -108,35 +108,9 @@
         button[type="submit"]:hover:not(:disabled) {
             background-color: #1c7ed6;
         }
-        #message {
-            display: none;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            text-align: center;
-        }
-        #message.success {
-            background-color: #d3f9d8;
-            color: #2b8a3e;
-            border: 1px solid #b2f2bb;
-        }
-        #message.error {
-            background-color: #ffe3e3;
-            color: #e03131;
-            border: 1px solid #ffc9c9;
-        }
     </style>
 </head>
 <body>
-
-<!-- Netlifyのボット（ビルドパーサー）に確実にフォーム構造を検出させるためのダミーフォーム -->
-<form name="stamp-applications" netlify netlify-honeypot="bot-field" hidden>
-    <input type="text" name="name" />
-    <input type="email" name="email" />
-    <input type="file" name="image" />
-    <textarea name="phrases"></textarea>
-</form>
 
 <div class="container">
     <h1>LINEスタンプ モニター応募</h1>
@@ -151,8 +125,14 @@
         </ul>
     </div>
 
-    <form name="stamp-applications" method="POST" enctype="multipart/form-data" id="stampForm">
-        <input type="hidden" name="form-name" value="stamp-applications">
+    <!-- Web3Formsへの送信設定 -->
+    <form action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data" id="stampForm">
+        
+        <!-- ★ここにWeb3Formsから取得したアクセスキーを入れてください -->
+        <input type="hidden" name="access_key" value="e5684add-bc6a-46a1-9a79-9cdf78d3f66c">
+        
+        <!-- 件名のカスタマイズ -->
+        <input type="hidden" name="subject" value="【LINEスタンプ応募】新規モニター申込">
 
         <div class="form-group">
             <label for="name">お名前（またはニックネーム）</label>
@@ -177,7 +157,6 @@
         </div>
 
         <button type="submit" id="submitBtn" disabled>ちょうど24個選ぶと送信できます</button>
-        <div id="message"></div>
     </form>
 </div>
 
@@ -196,8 +175,6 @@
     const grid = document.getElementById('phraseGrid');
     const counterEl = document.getElementById('counter');
     const submitBtn = document.getElementById('submitBtn');
-    const messageEl = document.getElementById('message');
-    const stampForm = document.getElementById('stampForm');
 
     phrases.forEach((phrase, index) => {
         const item = document.createElement('div');
@@ -243,11 +220,11 @@
         }
     }
 
-    stampForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-
+    // 送信時に24個チェックされているかの最終確認とリスト化
+    document.getElementById('stampForm').addEventListener('submit', function(event) {
         const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkedBoxes.length !== 24) {
+            event.preventDefault();
             alert('フレーズはちょうど24個選択してください。');
             return;
         }
@@ -257,36 +234,6 @@
             .join('\n');
         
         document.getElementById('phrases_input').value = selectedPhrasesList;
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = '送信中...';
-        messageEl.style.display = 'none';
-
-        const formData = new FormData(stampForm);
-
-        fetch("/", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                messageEl.className = "success";
-                messageEl.textContent = "ご応募ありがとうございました！正常に送信されました。";
-                messageEl.style.display = "block";
-                stampForm.reset();
-                updateSelection();
-            } else {
-                throw new Error("Form submission failed");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            messageEl.className = "error";
-            messageEl.textContent = "送信に失敗しました。もう一度お試しいただくか、時間をおいて実行してください。";
-            messageEl.style.display = "block";
-            submitBtn.disabled = false;
-            submitBtn.textContent = "この内容で申し込む";
-        });
     });
 </script>
 
