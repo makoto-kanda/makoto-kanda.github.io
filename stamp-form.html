@@ -130,6 +130,14 @@
 </head>
 <body>
 
+<!-- Netlifyのボット（ビルドパーサー）に確実にフォーム構造を検出させるためのダミーフォーム -->
+<form name="stamp-applications" netlify netlify-honeypot="bot-field" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="file" name="image" />
+    <textarea name="phrases"></textarea>
+</form>
+
 <div class="container">
     <h1>LINEスタンプ モニター応募</h1>
     <p class="intro">お気に入りの写真を元に、AIイラスト化して24個のスタンプを作成します！</p>
@@ -143,8 +151,7 @@
         </ul>
     </div>
 
-    <!-- Netlify Forms用のフォーム設定（POST先は現在のページ） -->
-    <form name="stamp-applications" method="POST" data-netlify="true" enctype="multipart/form-data" id="stampForm">
+    <form name="stamp-applications" method="POST" enctype="multipart/form-data" id="stampForm">
         <input type="hidden" name="form-name" value="stamp-applications">
 
         <div class="form-group">
@@ -236,7 +243,6 @@
         }
     }
 
-    // Ajax (fetch) によるフォーム送信処理
     stampForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -246,7 +252,6 @@
             return;
         }
 
-        // 1行ずつ綺麗に番号付きリスト化してhiddenに格納
         const selectedPhrasesList = Array.from(checkedBoxes)
             .map((cb, idx) => `${idx + 1}. ${cb.value}`)
             .join('\n');
