@@ -140,30 +140,34 @@
         </ul>
     </div>
 
+    <!-- form要素をそのままEmailJSに紐づける -->
     <form id="stampForm">
         <div class="form-group">
-            <label for="name">お名前（またはニックネーム）</label>
-            <input type="text" id="name" name="name" required placeholder="例：カンダ">
+            <label for="from_name">お名前（またはニックネーム）</label>
+            <input type="text" id="from_name" name="from_name" required placeholder="例：カンダ">
         </div>
 
         <div class="form-group">
-            <label for="email">連絡先メールアドレス</label>
-            <input type="email" id="email" name="email" required placeholder="example@email.com">
+            <label for="reply_to">連絡先メールアドレス</label>
+            <input type="email" id="reply_to" name="reply_to" required placeholder="example@email.com">
         </div>
 
         <div class="form-group">
             <label for="image">参照画像（1枚・人物やペット等）</label>
+            <!-- name="image" またはEmailJSの添付設定に合わせる -->
             <input type="file" id="image" name="image" accept="image/*" required>
             <small style="font-size: 11px; color: #666;">※はっきりと顔や姿が写っているものをお選びください。</small>
         </div>
 
         <div class="form-group">
             <label>スタンプにしたいフレーズを <span class="counter" id="counter">0</span> / 24個選んでください</label>
+            <!-- hiddenで隠しフィールドを作り、JSで選んだ24個のリストをここに格納して送信する -->
+            <input type="hidden" id="phrases_input" name="phrases">
             <div class="checkbox-grid" id="phraseGrid"></div>
         </div>
 
         <button type="submit" id="submitBtn" disabled>ちょうど24個選ぶと送信できます</button>
-        <div id="loading">画像をアップロード中... しばらくお待ちください</div>
+        <div id="loading">送信中... しばらくお待ちください</div>
     </form>
 </div>
 
@@ -190,7 +194,6 @@
         
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.name = 'phrases';
         checkbox.value = phrase;
         checkbox.id = 'phrase_' + index;
         checkbox.addEventListener('change', updateSelection);
@@ -209,7 +212,7 @@
     });
 
     function updateSelection() {
-        const checkedBoxes = document.querySelectorAll('input[name="phrases"]:checked');
+        const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
         const count = checkedBoxes.length;
         
         counterEl.textContent = count;
@@ -229,11 +232,11 @@
         }
     }
 
-    // フォーム送信処理（Imgbb経由でURL化してEmailJSで送信）
+    // フォーム送信処理（EmailJSのフォーム直接紐付け）
     document.getElementById('stampForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const checkedBoxes = document.querySelectorAll('input[name="phrases"]:checked');
+        const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkedBoxes.length !== 24) {
             alert('フレーズはちょうど24個選択してください。');
             return;
@@ -242,53 +245,24 @@
         submitBtn.style.display = 'none';
         loadingEl.style.display = 'block';
 
-        // 1行ずつ綺麗に番号付きリスト化
+        // 1行ずつ綺麗に番号付きリスト化してhiddenに格納
         const selectedPhrasesList = Array.from(checkedBoxes)
             .map((cb, idx) => `${idx + 1}. ${cb.value}`)
             .join('\n');
+        
+        document.getElementById('phrases_input').value = selectedPhrasesList;
 
-        const imageFile = document.getElementById('image').files[0];
-
-        // Imgbbの無料API（登録不要の匿名アップロード）へ画像を送信
-        const formData = new FormData();
-        formData.append('image', imageFile);
-
-        // ※imgbbの無料APIキー（パブリックなテスト用キーですが、ご自身で取得したい場合は https://api.imgbb.com/ で無料発行できます）
-        const imgbbApiKey = '6d207e02194a847a9449852f955d96f9'; 
-
-        fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (!result.success) {
-                throw new Error('画像のアップロードに失敗しました');
-            }
-
-            const imageUrl = result.data.url;
-
-            // EmailJSへ渡すパラメータ
-            const templateParams = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                phrases: selectedPhrasesList,
-                image_url: imageUrl
-            };
-
-            // ★ご自身の Service ID と Template ID に書き換えてください
-            return emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
-        })
-        .then(function(response) {
-            alert('応募が完了しました！ありがとうございます。');
-            location.reload();
-        })
-        .catch(function(error) {
-            alert('送信に失敗しました。画像サイズが大きいか、通信環境をご確認ください。');
-            console.error('ERROR:', error);
-            submitBtn.style.display = 'block';
-            loadingEl.style.display = 'none';
-        });
+        // ★ご自身の Service ID と Template ID に書き換えてください
+        emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', this)
+            .then(function(response) {
+                alert('応募が完了しました！ありがとうございます。');
+                location.reload();
+            }, function(error) {
+                alert('送信に失敗しました。ファイルサイズや通信環境をご確認ください。');
+                console.error('FAILED...', error);
+                submitBtn.style.display = 'block';
+                loadingEl.style.display = 'none';
+            });
     });
 </script>
 
