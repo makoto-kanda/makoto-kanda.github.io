@@ -144,12 +144,12 @@
         </ul>
     </div>
 
-    <!-- Web3Formsへの送信設定（通常テキストとして送る） -->
     <form action="https://api.web3forms.com/submit" method="POST" id="stampForm">
         
-        <!-- ★ここにWeb3Formsから取得したアクセスキーを入れてください -->
+        <!-- ★ここにあなたのAccess Keyを正確に貼り付けてください -->
         <input type="hidden" name="access_key" value="e5684add-bc6a-46a1-9a79-9cdf78d3f66c">
         <input type="hidden" name="subject" value="【LINEスタンプ応募】新規モニター申込">
+        <input type="hidden" name="from_name" value="LINEスタンプ応募フォーム">
 
         <div class="form-group">
             <label for="name">お名前（またはニックネーム）</label>
@@ -164,7 +164,6 @@
         <div class="form-group">
             <label for="imageFile">参照画像（1枚・人物やペット等）</label>
             <input type="file" id="imageFile" accept="image/*" required>
-            <!-- 画像をBase64文字列として格納して送信する隠しフィールド -->
             <input type="hidden" id="image_base64" name="image_base64">
             <small style="font-size: 11px; color: #666;">※はっきりと顔や姿が写っているものをお選びください。</small>
         </div>
@@ -172,7 +171,6 @@
         <div class="form-group">
             <div class="header-row">
                 <label style="margin-bottom:0;">フレーズを <span class="counter" id="counter">0</span> / 24個選択</label>
-                <!-- テスト用のランダム選択ボタン -->
                 <button type="button" class="random-btn" id="randomBtn">🎲 ランダムで24個選ぶ（テスト用）</button>
             </div>
             <input type="hidden" id="phrases_input" name="phrases">
@@ -200,7 +198,6 @@
     const submitBtn = document.getElementById('submitBtn');
     const randomBtn = document.getElementById('randomBtn');
 
-    // チェックボックスを動的生成
     phrases.forEach((phrase, index) => {
         const item = document.createElement('div');
         item.className = 'checkbox-item';
@@ -246,13 +243,10 @@
         }
     }
 
-    // 🎲 ランダムで24個選ぶボタンの処理
     randomBtn.addEventListener('click', function() {
         const checkboxes = document.querySelectorAll('input[name="phrase_item"]');
-        // 一旦すべてクリア
         checkboxes.forEach(cb => cb.checked = false);
 
-        // 32個のインデックスからランダムに24個選ぶ
         let indices = Array.from({length: 32}, (_, i) => i);
         for (let i = indices.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -260,7 +254,6 @@
         }
         const selectedIndices = indices.slice(0, 24);
 
-        // 選ばれたインデックスにチェックを入れる
         selectedIndices.forEach(idx => {
             checkboxes[idx].checked = true;
         });
@@ -268,7 +261,6 @@
         updateSelection();
     });
 
-    // 送信時の処理（画像をBase64テキストに変換して送信）
     document.getElementById('stampForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -289,16 +281,13 @@
 
         const reader = new FileReader();
         reader.onload = function(e) {
-            // 画像のBase64文字列を隠しフィールドにセット
             document.getElementById('image_base64').value = e.target.result;
 
-            // 24個のリストを整形してセット
             const selectedPhrasesList = Array.from(checkedBoxes)
                 .map((cb, idx) => `${idx + 1}. ${cb.value}`)
                 .join('\n');
             document.getElementById('phrases_input').value = selectedPhrasesList;
 
-            // 通常のフォームとしてWeb3Formsへ送信を実行
             document.getElementById('stampForm').submit();
         };
         reader.readAsDataURL(imageFile);
