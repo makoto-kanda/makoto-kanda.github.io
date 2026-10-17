@@ -266,6 +266,21 @@ const phrases = [
     document.getElementById('stampForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
+        // 名前の入力チェック（空欄・空白のみを禁止）
+        const nameInput = document.getElementById('name');
+        if (!nameInput.value.trim()) {
+            alert('お名前（またはニックネーム）を入力してください。');
+            nameInput.focus();
+            return;
+        }
+
+        // メールアドレスの入力チェック
+        const emailInput = document.getElementById('email');
+        if (!emailInput.value.trim() || !emailInput.validity.valid) {
+            alert('正しいメールアドレスを入力してください。');
+            emailInput.focus();
+            return;
+        }
         const checkedBoxes = document.querySelectorAll('input[name="phrase_item"]:checked');
         if (checkedBoxes.length !== 24) {
             alert('フレーズはちょうど24個選択してください。');
