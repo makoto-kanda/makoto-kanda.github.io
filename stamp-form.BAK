@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LINEスタンプ モニター応募</title>
-    <!-- EmailJSのSDK読み込み -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function() {
-            // ★ご自身のPublic Keyに書き換えてください
-            emailjs.init("YOUR_PUBLIC_KEY");
-        })();
-    </script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -140,28 +132,26 @@
         </ul>
     </div>
 
-    <!-- form要素をそのままEmailJSに紐づける -->
-    <form id="stampForm">
+    <!-- netlify属性を追加したフォーム（データ名：stamp-applications） -->
+    <form name="stamp-applications" method="POST" data-netlify="true" enctype="multipart/form-data" id="stampForm">
         <div class="form-group">
-            <label for="from_name">お名前（またはニックネーム）</label>
-            <input type="text" id="from_name" name="from_name" required placeholder="例：カンダ">
+            <label for="name">お名前（またはニックネーム）</label>
+            <input type="text" id="name" name="name" required placeholder="例：カンダ">
         </div>
 
         <div class="form-group">
-            <label for="reply_to">連絡先メールアドレス</label>
-            <input type="email" id="reply_to" name="reply_to" required placeholder="example@email.com">
+            <label for="email">連絡先メールアドレス</label>
+            <input type="email" id="email" name="email" required placeholder="example@email.com">
         </div>
 
         <div class="form-group">
             <label for="image">参照画像（1枚・人物やペット等）</label>
-            <!-- name="image" またはEmailJSの添付設定に合わせる -->
             <input type="file" id="image" name="image" accept="image/*" required>
             <small style="font-size: 11px; color: #666;">※はっきりと顔や姿が写っているものをお選びください。</small>
         </div>
 
         <div class="form-group">
             <label>スタンプにしたいフレーズを <span class="counter" id="counter">0</span> / 24個選んでください</label>
-            <!-- hiddenで隠しフィールドを作り、JSで選んだ24個のリストをここに格納して送信する -->
             <input type="hidden" id="phrases_input" name="phrases">
             <div class="checkbox-grid" id="phraseGrid"></div>
         </div>
@@ -232,18 +222,13 @@
         }
     }
 
-    // フォーム送信処理（EmailJSのフォーム直接紐付け）
     document.getElementById('stampForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
         const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkedBoxes.length !== 24) {
+            event.preventDefault();
             alert('フレーズはちょうど24個選択してください。');
             return;
         }
-
-        submitBtn.style.display = 'none';
-        loadingEl.style.display = 'block';
 
         // 1行ずつ綺麗に番号付きリスト化してhiddenに格納
         const selectedPhrasesList = Array.from(checkedBoxes)
@@ -252,17 +237,8 @@
         
         document.getElementById('phrases_input').value = selectedPhrasesList;
 
-        // ★ご自身の Service ID と Template ID に書き換えてください
-        emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', this)
-            .then(function(response) {
-                alert('応募が完了しました！ありがとうございます。');
-                location.reload();
-            }, function(error) {
-                alert('送信に失敗しました。ファイルサイズや通信環境をご確認ください。');
-                console.error('FAILED...', error);
-                submitBtn.style.display = 'block';
-                loadingEl.style.display = 'none';
-            });
+        submitBtn.style.display = 'none';
+        loadingEl.style.display = 'block';
     });
 </script>
 

@@ -132,8 +132,11 @@
         </ul>
     </div>
 
-    <!-- netlify属性を追加したフォーム（データ名：stamp-applications） -->
-    <form name="stamp-applications" method="POST" data-netlify="true" enctype="multipart/form-data" id="stampForm">
+    <!-- action="/" を指定してPOSTの送信先をトップルートに明示 -->
+    <form name="stamp-applications" action="/" method="POST" data-netlify="true" enctype="multipart/form-data" id="stampForm">
+        <!-- Netlifyフォーム識別用のhiddenフィールド -->
+        <input type="hidden" name="form-name" value="stamp-applications">
+
         <div class="form-group">
             <label for="name">お名前（またはニックネーム）</label>
             <input type="text" id="name" name="name" required placeholder="例：カンダ">
@@ -222,7 +225,8 @@
         }
     }
 
-    document.getElementById('stampForm').addEventListener('submit', function(event) {
+    // ボタンの「クリック時」にデータのセットだけを行い、フォーム送信はブラウザの標準動作に任せる
+    submitBtn.addEventListener('click', function(event) {
         const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
         if (checkedBoxes.length !== 24) {
             event.preventDefault();
