@@ -270,7 +270,7 @@ const phrases = [
     document.getElementById('stampForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        // 名前の入力チェック（空欄・空白のみを禁止）
+        // 名前の入力チェック
         const nameInput = document.getElementById('name');
         if (!nameInput.value.trim()) {
             alert('お名前（またはニックネーム）を入力してください。');
@@ -285,6 +285,7 @@ const phrases = [
             emailInput.focus();
             return;
         }
+
         const checkedBoxes = document.querySelectorAll('input[name="phrase_item"]:checked');
         if (checkedBoxes.length !== 24) {
             alert('フレーズはちょうど24個選択してください。');
@@ -298,18 +299,51 @@ const phrases = [
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = '変換して送信中...';
+        submitBtn.textContent = '画像を最適化して送信中...';
 
+        // --- 画像のリサイズ＆圧縮処理 (Canvas使用) ---
         const reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById('image_base64').value = e.target.result;
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
 
-            const selectedPhrasesList = Array.from(checkedBoxes)
-                .map((cb, idx) => `${idx + 1}. ${cb.value}`)
-                .join('\n');
-            document.getElementById('phrases_input').value = selectedPhrasesList;
+                // 長辺が1200pxを超える場合は縮小（AIの参照用として十分かつ軽量）
+                const MAX_SIDE = 1200;
+                if (width > MAX_SIDE || height > MAX_SIDE) {
+                    if (width > height) {
+                        height = Math.round((height * MAX_SIDE) / width);
+                        width = MAX_SIDE;
+                    } else {
+                        width = Math.round((width * MAX_SIDE) / height);
+                        height = MAX_SIDE;
+                    }
+                }
 
-            document.getElementById('stampForm').submit();
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // JPEG形式、品質 0.85 で圧縮してBase64に変換（サイズが数100KB〜1MB程度に収まる）
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+                // hidden要素にセット
+                document.getElementById('image_base64').value = compressedBase64;
+
+                // フレーズリストをセット
+                const selectedPhrasesList = Array.from(checkedBoxes)
+                    .map((cb, idx) => `${idx + 1}. ${cb.value}`)
+                    .join('\n');
+                document.getElementById('phrases_input').value = selectedPhrasesList;
+
+                // フォーム送信実行
+                document.getElementById('stampForm').submit();
+            };
+            img.src = e.target.result;
         };
         reader.readAsDataURL(imageFile);
     });
